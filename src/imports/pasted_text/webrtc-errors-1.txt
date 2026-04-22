@@ -1,0 +1,56 @@
+[Hydrated]
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31605 [WebRTC] No video: NotFoundError
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31605 [WebRTC] No audio: NotFoundError
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31607 [WebRTC] No media devices — joining as viewer (receive-only)
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31531 [Realtime] channel status: SUBSCRIBED
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31372 [WebRTC] createPC for hstumqgfsr
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31372 [WebRTC] createPC for keyxnv9gvrf
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31372 [WebRTC] createPC for c6s75i1nvq8
+28c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for hstumqgfsr host c8362efe-19b6-4f6d-b6f1-920be6bc97f2.local
+28c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for keyxnv9gvrf host c8362efe-19b6-4f6d-b6f1-920be6bc97f2.local
+28c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for c6s75i1nvq8 host c8362efe-19b6-4f6d-b6f1-920be6bc97f2.local
+28c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for keyxnv9gvrf srflx 178.68.53.173
+28c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for hstumqgfsr srflx 178.68.53.173
+28c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for c6s75i1nvq8 srflx 178.68.53.173
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31388 [WebRTC] track added for hstumqgfsr video live
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31405 [WebRTC] connectionState hstumqgfsr connecting
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31405 [WebRTC] connectionState keyxnv9gvrf connecting
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31388 [WebRTC] track added for c6s75i1nvq8 video live
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31388 [WebRTC] track added for c6s75i1nvq8 audio live
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31425 [WebRTC] renegotiating with c6s75i1nvq8
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for c6s75i1nvq8 host c8362efe-19b6-4f6d-b6f1-920be6bc97f2.local
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for c6s75i1nvq8 srflx 178.68.53.173
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31405 [WebRTC] connectionState c6s75i1nvq8 connecting
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31425 [WebRTC] renegotiating with c6s75i1nvq8
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31509 [WebRTC] answer error: InvalidAccessError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to set remote answer sdp: The order of m-lines in answer doesn't match order in offer. Rejecting answer.
+WS.be.current @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:31509
+await in WS.be.current
+(anonymous) @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:31529
+trigger @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:19516
+(anonymous) @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20340
+decode @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:19044
+onConnMessage @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20325
+conn.onmessage @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20124Understand this warning
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31425 [WebRTC] renegotiating with c6s75i1nvq8
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31509 [WebRTC] answer error: InvalidAccessError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to set remote answer sdp: The order of m-lines in answer doesn't match order in offer. Rejecting answer.
+WS.be.current @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:31509
+await in WS.be.current
+(anonymous) @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:31529
+trigger @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:19516
+(anonymous) @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20340
+decode @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:19044
+onConnMessage @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20325
+conn.onmessage @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20124Understand this warning
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31509 [WebRTC] answer error: InvalidAccessError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to set remote answer sdp: Failed to apply the description for m= section with mid='1': Failed to setup RTCP mux.
+WS.be.current @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:31509
+await in WS.be.current
+(anonymous) @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:31529
+trigger @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:19516
+(anonymous) @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20340
+decode @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:19044
+onConnMessage @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20325
+conn.onmessage @ 8c43ec82e927a49ce5d52c6283d640996645a64e.js:20124Understand this warning
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for hstumqgfsr host c8362efe-19b6-4f6d-b6f1-920be6bc97f2.local
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for hstumqgfsr srflx 178.68.53.173
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for keyxnv9gvrf host c8362efe-19b6-4f6d-b6f1-920be6bc97f2.local
+8c43ec82e927a49ce5d52c6283d640996645a64e.js:31399 [WebRTC] ICE candidate for keyxnv9gvrf srflx 178.68.53.173
