@@ -77,7 +77,7 @@ export function MeetingRoom({ roomId, onLeave, initialStream }: MeetingRoomProps
     connectionState,
     connectionError,
     retryJoin,
-    getVideoStats,
+    subscribeToVideoStats,
   } = useWebRTC(roomId, userName, initialStream);
 
   const [audioEnabled, setAudioEnabled] = useState(localAudioEnabled);
@@ -278,7 +278,7 @@ export function MeetingRoom({ roomId, onLeave, initialStream }: MeetingRoomProps
       {/* ── Main video area ───────────────────────────────────────────────── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
         <div className="flex-1 min-w-0 min-h-0" style={{ position: 'relative' }}>
-          <VideoGrid participants={participants} localStream={localStream} getVideoStats={getVideoStats} />
+          <VideoGrid participants={participants} localStream={localStream} subscribeToVideoStats={subscribeToVideoStats} />
         </div>
 
         {/* Participants sidebar — desktop */}
@@ -305,7 +305,7 @@ export function MeetingRoom({ roomId, onLeave, initialStream }: MeetingRoomProps
         )}
       </div>
 
-      {/* ── Controls bar ─────────────────────────────────────────────���───── */}
+      {/* ── Controls bar ────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-6 bg-[#202124]">
 
         {/* Left: room link — desktop only */}
