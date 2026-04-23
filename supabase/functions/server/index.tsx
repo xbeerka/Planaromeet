@@ -20,9 +20,82 @@ app.use(
   }),
 );
 
+// ── LiveKit JWT helpers ────────────────────────────────────────────────────
+function b64url(bytes: Uint8Array): string {
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+function jsonB64(obj: object): string {
+  return b64url(new TextEncoder().encode(JSON.stringify(obj)));
+}
+
+async function signLiveKitToken(
+  apiKey: string,
+  apiSecret: string,
+  roomName: string,
+  participantIdentity: string,
+  participantName: string,
+): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  const header  = jsonB64({ alg: 'HS256', typ: 'JWT' });
+  const payload = jsonB64({
+    iss: apiKey,
+    sub: participantIdentity,
+    iat: now,
+    exp: now + 3600,
+    jti: `${participantIdentity}-${now}`,
+    name: participantName,
+    video: {
+      room: roomName,
+      roomJoin: true,
+      roomCreate: true,
+      canPublish: true,
+      canSubscribe: true,
+      canPublishData: true,
+    },
+  });
+
+  const data = `${header}.${payload}`;
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(apiSecret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data));
+  return `${data}.${b64url(new Uint8Array(sig))}`;
+}
+// ──────────────────────────────────────────────────────────────────────────
+
 // Health check endpoint
 app.get("/make-server-b5560c10/health", (c) => {
   return c.json({ status: "ok" });
+});
+
+// ── LiveKit token endpoint ────────────────────────────────────────────────
+app.post("/make-server-b5560c10/livekit-token", async (c) => {
+  try {
+    const apiKey    = Deno.env.get("LIVEKIT_API_KEY");
+    const apiSecret = Deno.env.get("LIVEKIT_API_SECRET");
+    const livekitUrl = Deno.env.get("LIVEKIT_URL") ?? "wss://meet.planaro.ru";
+
+    if (!apiKey || !apiSecret) {
+      return c.json({ error: "LiveKit not configured (missing LIVEKIT_API_KEY / LIVEKIT_API_SECRET)" }, 500);
+    }
+
+    const { roomId, participantId, participantName } = await c.req.json();
+    if (!roomId || !participantId || !participantName) {
+      return c.json({ error: "Missing roomId, participantId or participantName" }, 400);
+    }
+
+    const token = await signLiveKitToken(apiKey, apiSecret, roomId, participantId, participantName);
+    return c.json({ token, url: livekitUrl });
+  } catch (error) {
+    console.log("LiveKit token error:", error);
+    return c.json({ error: `Failed to generate token: ${error.message}` }, 500);
+  }
 });
 
 // Join room - add participant to room

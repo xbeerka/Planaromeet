@@ -3,7 +3,7 @@ import { Mic, MicOff, Videocam, VideocamOff } from '@mui/icons-material';
 
 interface PreJoinLobbyProps {
   roomId: string;
-  onJoin: () => void;
+  onJoin: (stream: MediaStream | null) => void;  // pass stream instead of stopping it
   onCancel: () => void;
 }
 
@@ -19,6 +19,9 @@ export function PreJoinLobby({ roomId, onJoin, onCancel }: PreJoinLobbyProps) {
   const [nameError, setNameError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  // Set to true when the user confirms join — prevents cleanup from stopping
+  // tracks that have been handed off to the meeting room.
+  const streamHandedOff = useRef(false);
 
   // Acquire preview stream
   useEffect(() => {
@@ -26,52 +29,56 @@ export function PreJoinLobby({ roomId, onJoin, onCancel }: PreJoinLobbyProps) {
     const tracks: MediaStreamTrack[] = [];
 
     (async () => {
+      // ── Single combined request: one permission prompt on Android ────────
+      // Requesting video+audio together avoids multiple browser permission
+      // dialogs. Fall back to separate calls only if combined fails (e.g.
+      // device not present).
+      let vt: MediaStreamTrack | null = null;
+      let at: MediaStreamTrack | null = null;
+
       try {
-        // First call: get permission and unlock device labels
-        const vs = await navigator.mediaDevices.getUserMedia({
+        const combined = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: 'user' } },
-          audio: false,
+          audio: true,
         });
-        let vt = vs.getVideoTracks()[0];
-
-        if (vt) {
-          // After permission is granted, enumerate to find the preferred camera
-          // (standard/normal camera is typically the LAST in the list)
-          try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const cameras = devices.filter((d) => d.kind === 'videoinput' && d.deviceId);
-            if (cameras.length > 1) {
-              const currentId = vt.getSettings().deviceId ?? '';
-              const nonWide = cameras.filter((d) => !/ultra.?wide|wide.?angle/i.test(d.label));
-              const target = (nonWide.length > 0 ? nonWide : cameras)[cameras.length - 1];
-              if (target?.deviceId && target.deviceId !== currentId) {
-                vt.stop();
-                const betterVs = await navigator.mediaDevices.getUserMedia({
-                  video: { deviceId: { exact: target.deviceId } },
-                  audio: false,
-                });
-                vt = betterVs.getVideoTracks()[0] ?? vt;
-              }
-            }
-          } catch {}
-
-          tracks.push(vt);
-          if (active) setHasCamera(true);
-        }
+        vt = combined.getVideoTracks()[0] ?? null;
+        at = combined.getAudioTracks()[0] ?? null;
       } catch {
-        // fallback — any camera
-        try {
-          const vs = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-          const vt = vs.getVideoTracks()[0];
-          if (vt) { tracks.push(vt); if (active) setHasCamera(true); }
-        } catch {}
+        // Combined failed (one device missing) — try each separately
+        const [vRes, aRes] = await Promise.allSettled([
+          navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'user' } }, audio: false }),
+          navigator.mediaDevices.getUserMedia({ video: false, audio: true }),
+        ]);
+        if (vRes.status === 'fulfilled') vt = vRes.value.getVideoTracks()[0] ?? null;
+        if (aRes.status === 'fulfilled') at = aRes.value.getAudioTracks()[0] ?? null;
       }
 
-      try {
-        const as = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-        const at = as.getAudioTracks()[0];
-        if (at) { tracks.push(at); if (active) setHasMic(true); }
-      } catch {}
+      // ── Ensure front camera ──────────────────────────────────────────────
+      if (vt) {
+        const facing = vt.getSettings?.().facingMode;
+        const isBackCamera =
+          facing === 'environment' ||
+          /ultra.?wide|wide.?angle|\b(back|rear)\b/i.test(vt.label);
+        if (isBackCamera) {
+          try {
+            vt.stop();
+            const frontVs = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: { exact: 'user' } },
+              audio: false,
+            });
+            vt = frontVs.getVideoTracks()[0] ?? vt;
+          } catch {
+            // facingMode:exact not supported (desktop) — keep current track
+          }
+        }
+        tracks.push(vt);
+        if (active) setHasCamera(true);
+      }
+
+      if (at) {
+        tracks.push(at);
+        if (active) setHasMic(true);
+      }
 
       if (!active) { tracks.forEach(t => t.stop()); return; }
 
@@ -83,7 +90,11 @@ export function PreJoinLobby({ roomId, onJoin, onCancel }: PreJoinLobbyProps) {
 
     return () => {
       active = false;
-      tracks.forEach(t => t.stop());
+      // Only stop tracks if we kept the stream (user cancelled / backed out).
+      // If the stream was handed off to the meeting room, leave it alive.
+      if (!streamHandedOff.current) {
+        tracks.forEach(t => t.stop());
+      }
     };
   }, []);
 
@@ -111,8 +122,11 @@ export function PreJoinLobby({ roomId, onJoin, onCancel }: PreJoinLobbyProps) {
       return;
     }
     localStorage.setItem('userName', name.trim());
-    stream?.getTracks().forEach(t => t.stop());
-    onJoin();
+    // Mark stream as handed off so the cleanup effect won't stop its tracks.
+    streamHandedOff.current = true;
+    // Don't stop tracks — hand the live stream to the meeting room
+    // so useWebRTC can reuse it without a second getUserMedia call.
+    onJoin(stream);
   };
 
   const nameBorderColor = nameFocused

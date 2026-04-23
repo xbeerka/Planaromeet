@@ -1,3 +1,19 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/* Ensure the app fills the true visible viewport on mobile (dvh fixes iOS Safari bar) */
+html {
+  height: 100%;
+  height: 100dvh;
+}
+body {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+#root {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}

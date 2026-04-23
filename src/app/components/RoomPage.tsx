@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PreJoinLobby } from './PreJoinLobby';
 import { MeetingRoom } from './MeetingRoom';
 
@@ -21,18 +21,25 @@ interface RoomPageProps {
 
 export function RoomPage({ roomId, onLeave }: RoomPageProps) {
   const [view, setView] = useState<RoomView>(() => getInitialView(roomId));
+  // Keep the preview stream alive so useWebRTC can reuse it without a
+  // second getUserMedia call (avoids re-prompting for permissions on Android).
+  const initialStreamRef = useRef<MediaStream | null>(null);
 
-  // Сбрасываем вид если roomId поменялся
+  // Reset view when room changes
   useEffect(() => {
     setView(getInitialView(roomId));
   }, [roomId]);
 
-  const handleJoinConfirmed = () => {
+  const handleJoinConfirmed = (stream: MediaStream | null) => {
+    initialStreamRef.current = stream;
     try { sessionStorage.setItem(SESSION_PREFIX + roomId, '1'); } catch {}
     setView('meeting');
   };
 
   const handleCancel = () => {
+    // User backed out — stop preview tracks
+    initialStreamRef.current?.getTracks().forEach(t => t.stop());
+    initialStreamRef.current = null;
     onLeave();
   };
 
@@ -51,5 +58,11 @@ export function RoomPage({ roomId, onLeave }: RoomPageProps) {
     );
   }
 
-  return <MeetingRoom roomId={roomId} onLeave={handleLeave} />;
+  return (
+    <MeetingRoom
+      roomId={roomId}
+      onLeave={handleLeave}
+      initialStream={initialStreamRef.current}
+    />
+  );
 }
